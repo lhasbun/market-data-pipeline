@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "market-pipeline"
+version = "0.1.0"
+description = "A market data ETL pipeline for ingesting, validating, and storing OHLCV data."
+authors = [
+    { name = "Luis Hasbun" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "pandas>=2.0",
+    "pyarrow>=15.0",
+    "yfinance>=0.2",
+    "requests>=2.31",
+    "python-dotenv>=1.0",
+    "typer>=0.12",
+    "structlog>=24.1",
+    "duckdb>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-mock>=3.10",
+    "ruff>=0.3",
+    "black>=24.0",
+]
+
+[project.scripts]
+market-pipeline = "market_pipeline.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]

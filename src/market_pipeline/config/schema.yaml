@@ -1,0 +1,7 @@
+ohlcv_schema:
+  timestamp: datetime64[ns, UTC]
+  open: float
+  high: float
+  low: float
+  close: float
+  volume: int

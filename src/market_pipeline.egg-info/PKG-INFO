@@ -1,0 +1,76 @@
+Metadata-Version: 2.4
+Name: market-pipeline
+Version: 0.1.0
+Summary: A market data ETL pipeline for ingesting, validating, and storing OHLCV data.
+Author: Luis Hasbun
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0
+Requires-Dist: pyarrow>=15.0
+Requires-Dist: yfinance>=0.2
+Requires-Dist: requests>=2.31
+Requires-Dist: python-dotenv>=1.0
+Requires-Dist: typer>=0.12
+Requires-Dist: structlog>=24.1
+Requires-Dist: duckdb>=1.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.10; extra == "dev"
+Requires-Dist: ruff>=0.3; extra == "dev"
+Requires-Dist: black>=24.0; extra == "dev"
+
+# Market Data ETL Pipeline
+
+A production-style Python pipeline for ingesting, validating, and storing daily OHLCV market data from multiple data providers. Built for reliability, reproducibility, and extensibility.
+
+## Features
+- Multi-source OHLCV ingestion (Yahoo Finance, Alpha Vantage, etc.)
+- Unified schema + data normalization
+- Data validation (missing timestamps, duplicates, ordering)
+- Parquet-based data lake with partitioning
+- Config-driven architecture (YAML/TOML)
+- CLI for running ingestion jobs
+- Dockerized runtime environment
+- Optional scheduling (cron, Airflow, or Prefect)
+- Unit + integration tests
+- DuckDB analytics examples
+
+## Project Structure
+market-data-pipeline/
+  src/market_pipeline/
+  tests/
+  data/
+  pyproject.toml
+  README.md
+  .gitignore
+
+## Installation
+Run: pip install . or pip install -e .
+
+## Running the Pipeline
+market-pipeline update --symbol AAPL
+market-pipeline update
+
+## Configuration
+Config lives in src/market_pipeline/config/default_config.yaml
+
+## Data Storage Layout
+Partitioned Parquet lake under data/
+
+## Development
+pytest, ruff, black
+
+## Docker
+Build and run the image
+
+## Example Analysis (DuckDB)
+Simple SQL query example
+
+## Roadmap
+Future enhancements listed
+
+## License
+MIT License
+
+## Author
+Luis Hasbun

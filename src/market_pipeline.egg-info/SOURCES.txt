@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/market_pipeline/__init__.py
+src/market_pipeline/cli.py
+src/market_pipeline/ingest.py
+src/market_pipeline/store.py
+src/market_pipeline/validate.py
+src/market_pipeline.egg-info/PKG-INFO
+src/market_pipeline.egg-info/SOURCES.txt
+src/market_pipeline.egg-info/dependency_links.txt
+src/market_pipeline.egg-info/entry_points.txt
+src/market_pipeline.egg-info/requires.txt
+src/market_pipeline.egg-info/top_level.txt
+tests/test_ingest.py
+tests/test_store.py
+tests/test_validate.py
