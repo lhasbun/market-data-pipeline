@@ -1,55 +1,127 @@
 # Market Data ETL Pipeline
 
-A production-style Python pipeline for ingesting, validating, and storing daily OHLCV market data from multiple data providers. Built for reliability, reproducibility, and extensibility.
+A production‑style Python pipeline for ingesting, validating, and storing daily OHLCV market data from multiple data providers. Designed for reliability, reproducibility, and extensibility — following real data engineering patterns.
+
+---
 
 ## Features
-- Multi-source OHLCV ingestion (Yahoo Finance, Alpha Vantage, etc.)
+
+- Multi‑source OHLCV ingestion  
+  - Yahoo Finance (full history, free)
+  - Alpha Vantage (free‑tier fallback)
 - Unified schema + data normalization
-- Data validation (missing timestamps, duplicates, ordering)
-- Parquet-based data lake with partitioning
-- Config-driven architecture (YAML/TOML)
-- CLI for running ingestion jobs
+- Config‑driven architecture (YAML + `.env`)
+- Data validation (schema enforcement, timestamp normalization)
+- Partitioned Parquet data lake (`symbol=…/year=…/month=…`)
+- Unified ingestion interface with provider priority + fallback
+- CLI for running ingestion jobs (Typer)
 - Dockerized runtime environment
-- Optional scheduling (cron, Airflow, or Prefect)
 - Unit + integration tests
 - DuckDB analytics examples
 
+---
+
 ## Project Structure
+
 market-data-pipeline/
-  src/market_pipeline/
-  tests/
-  data/
-  pyproject.toml
-  README.md
-  .gitignore
+	src/
+		market_pipeline/
+			config/
+				default_config.yaml
+				schema.yaml
+			ingest.py
+			schema.py	
+			config_loader.py
+	data/	# Parquet data lake (gitignored)                 
+	tests/
+	.venv/	# Virtual environment (gitignored)
+	.env # API keys + secrets (gitignored)
+	pyproject.toml
+	README.md
+	.gitignore
 
-## Installation
-Run: pip install . or pip install -e .
+---
 
-## Running the Pipeline
-market-pipeline update --symbol AAPL
-market-pipeline update
+## Installation & Environment Setup
+
+### 1. Create and activate a virtual environment
+python -m venv .venv ..venv\Scripts\activate
+### 2. Install the project
+pip install -e .
+### 3. Add your API keys to `.env`
+ALPHA_VANTAGE_API_KEY=your_key_here
+
+---
 
 ## Configuration
-Config lives in src/market_pipeline/config/default_config.yaml
+
+All non‑secret configuration lives in:
+src/market_pipeline/config/default_config.yaml
+Secrets (API keys) stay in .env.
+
+## Schema Definition
+Canonical OHLCV schema lives in:
+src/market_pipeline/config/schema.yaml
+
+ohlcv_schema:
+  timestamp: datetime64[ns, UTC]
+  open: float
+  high: float
+  low: float
+  close: float
+  volume: int
+
+Schema enforcement is implemented in:
+src/market_pipeline/schema.py
+
+## Ingestion Layer
+Yahoo Finance (primary provider)
+- Full historical OHLCV
+- Free
+- Reliable
+Alpha Vantage (fallback provider)
+- Free tier returns last ~100 days (outputsize=compact)
+- Used only when Yahoo fails
+
+Unified ingestion interface
+
+fetch("AAPL")
+
+Automatically:
+- Tries Yahoo
+- Falls back to Alpha Vantage
+- Returns normalized OHLCV data
+
+## Running the Pipeline
+Fetch data for a single symbol:
+
+market-pipeline update --symbol AAPL
+
+Fetch all symbols from config:
+
+market-pipeline update
 
 ## Data Storage Layout
-Partitioned Parquet lake under data/
 
-## Development
-pytest, ruff, black
+Data is stored as partitioned Parquet under data/:
 
-## Docker
-Build and run the image
+data/
+  symbol=AAPL/
+    year=2024/
+      month=01/
+        data.parquet
 
-## Example Analysis (DuckDB)
-Simple SQL query example
-
-## Roadmap
-Future enhancements listed
+This structure is optimized for DuckDB, Spark, and analytical workloads.
 
 ## License
 MIT License
 
 ## Author
-Luis Hasbun
+Luis Eduardo Hasbun
+
+
+
+
+
+
+
