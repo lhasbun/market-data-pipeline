@@ -30,5 +30,8 @@ def enforce_schema(df: pd.DataFrame) -> pd.DataFrame:
     # Normalize timestamp
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
 
+    # Sort timestamps 
+    df = df.sort_values("timestamp").reset_index(drop=True)
+
     return df
 

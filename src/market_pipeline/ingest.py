@@ -86,6 +86,8 @@ def fetch_yahoo(symbol: str, start: str | None = "2015-01-01", end: str | None =
 
     df = enforce_schema(df=df) # Enforce schema
 
+    df = df.sort_values("timestamp").reset_index(drop=True) # Sort again in case Yahoo returned mixed timezone formats
+
     return df
 
 def fetch_alpha_vantage(symbol: str) -> pd.DataFrame:
@@ -146,5 +148,7 @@ def fetch_alpha_vantage(symbol: str) -> pd.DataFrame:
     df["volume"] = df["volume"].astype(dtype=int)
 
     df = enforce_schema(df) # Enforce schema
+
+    df = df.sort_values("timestamp").reset_index(drop=True)
 
     return df
