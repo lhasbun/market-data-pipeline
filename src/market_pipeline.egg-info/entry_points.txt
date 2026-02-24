@@ -1,2 +1,2 @@
 [console_scripts]
-market-pipeline = market_pipeline.cli:app
+market-pipeline = market_pipeline.cli:main

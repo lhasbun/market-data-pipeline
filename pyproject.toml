@@ -32,7 +32,7 @@ dev = [
 ]
 
 [project.scripts]
-market-pipeline = "market_pipeline.cli:app"
+market-pipeline = "market_pipeline.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

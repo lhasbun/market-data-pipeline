@@ -1,4 +1,5 @@
 import pandas as pd 
+from .load import load_existing
 
 class ValidationError(Exception):
     """
@@ -68,3 +69,27 @@ def validate(df: pd.DataFrame):
     check_negative_values(df)
 
     return True
+
+def validate_symbol(symbol: str):
+    """
+    Validate data based on symbol (used by CLI command)
+
+    :param symbol: Stock ticker symbol
+    :type symbol: str
+    """
+    df = load_existing(symbol=symbol)
+
+    if df is None:
+        raise ValueError(f"No data found for symbol: {symbol}")
+    
+    dupes = df.duplicated(subset=["timestamp"], keep=False)
+
+    if dupes.any():
+        dup_rows = df[df.duplicated(subset=["timestamp"], keep=False)]
+
+        if not dup_rows.duplicated().all():
+            raise ValidationError(f"Conflicting duplicate timestamps found:\n{dup_rows}")
+    
+    df = df.drop_duplicates(subset=["timestamp"])
+
+    validate(df=df)

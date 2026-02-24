@@ -2,7 +2,12 @@ README.md
 pyproject.toml
 src/market_pipeline/__init__.py
 src/market_pipeline/cli.py
+src/market_pipeline/config_loader.py
 src/market_pipeline/ingest.py
+src/market_pipeline/load.py
+src/market_pipeline/merge.py
+src/market_pipeline/pipeline.py
+src/market_pipeline/schema.py
 src/market_pipeline/store.py
 src/market_pipeline/validate.py
 src/market_pipeline.egg-info/PKG-INFO

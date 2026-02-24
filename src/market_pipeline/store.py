@@ -23,25 +23,21 @@ def store(symbol: str, df: pd.DataFrame, data_dir: str = "data/"):
 
     df = enforce_schema(df) # Enforce schema before writing
 
-    df["year"] = df["timestamp"].dt.year.astype(str) # Add partition columns
+    df = df.copy()
+
+    df["year"] = df["timestamp"].dt.year.astype(str) # Add partition columns as str
     df["month"] = df["timestamp"].dt.month.astype(str).str.zfill(2)
 
-    table = pa.Table.from_pandas(df) # Convert to arrow table
+    df.convert_dtypes() 
 
-    base = Path(data_dir) / f"symbol={symbol}" # Build base directory E.g. data/ symbol=AAPL/
+    path = Path(data_dir) / f"symbol={symbol}" # Build base directory E.g. data/ symbol=AAPL/
 
-    for year in df["year"].unique():
-        for month in df["month"].unique():
-            partition_path = base / f"year={year}" / f"month={month}" # E.g. year=2024/ month=01/
-            partition_path.mkdir(parents=True, exist_ok=True)
-
-            file_path = partition_path / "data.parquet"
-
-            # Filter rows for partition
-            part_df = df[(df["year"] == year) & (df["month"] == month)]
-            part_table = pa.Table.from_pandas(part_df) 
-
-            pq.write_table(part_table, file_path) # Write partition table to filepath
+    df.to_parquet(
+        path=path,
+        partition_cols=["year", "month"],
+        engine="pyarrow",
+        index=False
+    )
 
 def store_with_config(symbol: str, df: pd.DataFrame, config: dict):
     """
