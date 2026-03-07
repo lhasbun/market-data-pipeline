@@ -1,9 +1,11 @@
 from .config_loader import load_config
 from .ingest import fetch
-from .validate import ValidationError, validate
+from .validate import validate
 from .store import store_with_config
 from .load import load_existing
 from .merge import merge_data
+from .retry import retry
+import pandas as pd
 
 def run_pipeline(symbol: str | None = None):
     """
@@ -33,7 +35,7 @@ def run_pipeline(symbol: str | None = None):
         else:
             print(f"No existing data found for {sym}")
 
-        new = fetch(symbol=sym, config=config) # Fetch new data
+        new = fetch_with_retry(symbol=sym, config=config) # Fetch new data
         print(f"Fetched {len(new)} new rows for {sym}")
 
         merged = merge_data(existing=existing, new=new) # Merge data
@@ -44,4 +46,7 @@ def run_pipeline(symbol: str | None = None):
 
         store_with_config(symbol=sym, df=merged, config=config) # Store merged dataset
         print(f"Stored updated data for {sym}")
+
+def fetch_with_retry(symbol: str, config: dict):
+    return retry(lambda: fetch(symbol=symbol, config=config))
 

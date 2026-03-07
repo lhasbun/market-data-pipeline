@@ -1,5 +1,8 @@
 import pandas as pd
 
+class MergeConflictError(Exception):
+    pass
+
 def merge_data(existing: pd.DataFrame | None, new: pd.DataFrame) -> pd.DataFrame:
     """
     Merges existing and new DataFrames.
@@ -23,3 +26,22 @@ def merge_data(existing: pd.DataFrame | None, new: pd.DataFrame) -> pd.DataFrame
     df = df.sort_values("timestamp").reset_index(drop=True) # Sort ascending
 
     return df
+
+def merge_existing(existing: pd.DataFrame, new: pd.DataFrame) -> pd.DataFrame:
+    """
+    Merge existing stored data with newly ingested data
+    Exact duplicates are dropped, conflicting duplicates raise an error
+    """
+    
+    merged = pd.concat([existing, new], ignore_index=True) # Concatenate dataframes
+
+    dupes = merged[merged.duplicated(subset=["timestamp"], keep=False)] # Detect duplicate timestamps
+
+    if not dupes.empty:
+        if not dupes.duplicated().all(): # Check if duplicates are exact
+            raise MergeConflictError( 
+                f"Conflicting duplicate timestamps detected:\n{dupes}" # If duplicates raise error
+            )
+        merged = merged.drop_duplicates(subset=["timestamp"], keep="first") # Drop exact duplicates
+
+    return merged

@@ -6,6 +6,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from datetime import datetime, UTC
 from .schema import enforce_schema
+from .metrics import record
 
 load_dotenv() # Load Alpha Vantage API key from .env
 
@@ -32,6 +33,8 @@ def fetch(symbol: str, start: str | None = None, end: str | None = None, config:
     else:
         providers = ["yahoo", "alpha_vantage"]
 
+    errors = [] # Error logging 
+
     for provider in providers:
         try:
             logger.info("fetch_attempt", provider=provider, symbol=symbol) # Log fetch attempt
@@ -42,7 +45,9 @@ def fetch(symbol: str, start: str | None = None, end: str | None = None, config:
                 return fetch_alpha_vantage(symbol=symbol)
             raise ValueError(f"Unknown provider: {provider}") # Error chekc: if provider is not known
         except Exception as e:
-            logger.warning("fetch_failed", provider=provider, symbol=symbol, error=str(e)) # Log fetch failure
+            record(provider=provider, event="failure")
+            errors.append((provider, str(e)))
+            continue
     
     raise RuntimeError(f"All providers failed for symbol: {symbol}") # Error check: No result in either provider
 
