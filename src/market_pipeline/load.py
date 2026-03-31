@@ -14,6 +14,9 @@ def load_existing(symbol: str, data_dir: str = "data/") -> pd.DataFrame | None:
     :rtype: DataFrame or None
 
     """
+    if data_dir is None:
+        raise ValueError("Error: param base_path mst be provided")
+
     base = Path(data_dir) / f"symbol={symbol}" # Path: data/ symbol=AAPL/
 
     if not base.exists(): # If directory does not exist, return None

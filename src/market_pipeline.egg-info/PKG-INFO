@@ -5,19 +5,19 @@ Summary: A market data ETL pipeline for ingesting, validating, and storing OHLCV
 Author: Luis Hasbun
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
-Requires-Dist: pandas>=2.0
-Requires-Dist: pyarrow>=15.0
-Requires-Dist: yfinance>=0.2
+Requires-Dist: pandas>=3.0
+Requires-Dist: pyarrow>=23.0
+Requires-Dist: yfinance>=1.0
 Requires-Dist: requests>=2.31
 Requires-Dist: python-dotenv>=1.0
 Requires-Dist: typer>=0.12
-Requires-Dist: structlog>=24.1
+Requires-Dist: structlog>=25.0
 Requires-Dist: duckdb>=1.0
 Provides-Extra: dev
-Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest>=9.0; extra == "dev"
 Requires-Dist: pytest-mock>=3.10; extra == "dev"
 Requires-Dist: ruff>=0.3; extra == "dev"
-Requires-Dist: black>=24.0; extra == "dev"
+Requires-Dist: black>=26.0; extra == "dev"
 
 # Market Data ETL Pipeline
 
@@ -68,7 +68,8 @@ market-data-pipeline/
 ### 1. Create and activate a virtual environment
 python -m venv .venv ..venv\Scripts\activate
 ### 2. Install the project
-pip install -e .
+pip install -e 
+pip install -e "[dev]" (If using test modules)
 ### 3. Add your API keys to `.env`
 ALPHA_VANTAGE_API_KEY=your_key_here
 

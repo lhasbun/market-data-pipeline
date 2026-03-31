@@ -44,4 +44,9 @@ def merge_existing(existing: pd.DataFrame, new: pd.DataFrame) -> pd.DataFrame:
             )
         merged = merged.drop_duplicates(subset=["timestamp"], keep="first") # Drop exact duplicates
 
+    merged["year"] = merged["timestamp"].dt.year.astype(int) # Add partition columns 
+    merged["month"] = merged["timestamp"].dt.month.astype(int)
+
+    merged = merged.sort_values(["timestamp"]).reset_index(drop=True)
+
     return merged

@@ -47,7 +47,8 @@ market-data-pipeline/
 ### 1. Create and activate a virtual environment
 python -m venv .venv ..venv\Scripts\activate
 ### 2. Install the project
-pip install -e .
+pip install -e 
+pip install -e "[dev]" (If using test modules)
 ### 3. Add your API keys to `.env`
 ALPHA_VANTAGE_API_KEY=your_key_here
 

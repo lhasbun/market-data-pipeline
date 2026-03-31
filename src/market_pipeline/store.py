@@ -7,41 +7,7 @@ import pyarrow.parquet as pq
 from pathlib import Path
 from .schema import enforce_schema
 from .load import load_existing
-
-def store(symbol: str, df: pd.DataFrame, data_dir: str = "data/"):
-    """
-    Store OHLCV data in a partitioned Parquet layout:
-    data/
-      symbol=AAPL/
-        year=2024/
-          month=01/
-            data.parquet
-
-    :param symbol: Stock ticker symbol
-    :type symbol: str
-    :param df: Pandas dataframe OHLCV data from Yahoo Finance, Alpha Vantage, or both for a given symbol
-    :type df: DataFrame
-    :param data_dir: Data directory for storage (Default = "data/")
-    :type data_dir: str
-    """
-
-    df = enforce_schema(df) # Enforce schema before writing
-
-    df = df.copy()
-
-    df["year"] = df["timestamp"].dt.year.astype(str) # Add partition columns as str
-    df["month"] = df["timestamp"].dt.month.astype(str).str.zfill(2)
-
-    df.convert_dtypes() 
-
-    path = Path(data_dir) / f"symbol={symbol}" # Build base directory E.g. data/ symbol=AAPL/
-
-    df.to_parquet(
-        path=path,
-        partition_cols=["year", "month"],
-        engine="pyarrow",
-        index=False
-    )
+from .merge import merge_existing
 
 def store_with_config(symbol: str, df: pd.DataFrame, config: dict):
     """
@@ -55,11 +21,22 @@ def store_with_config(symbol: str, df: pd.DataFrame, config: dict):
     :type config: dict
     """
 
-    existing = load_existing(symbol=symbol)
-    
+    existing = load_existing(symbol=symbol) # Load existing data
+
+    if existing is not None:
+        merged = merge_existing(existing=existing, new=df)
+    else:
+        merged = df.copy()
+        merged["year"] = merged["timestamp"].dt.year.astype(int)
+        merged["month"] = merged["timestamp"].dt.month.astype(int)
+
+    changed = detect_changed_partitions(df=merged) # Detect changed partitions
+    print(f"[store] {symbol}: {len(changed)} partitions changed") 
+
+    changed_tuple = tuple(changed)
 
     data_dir = config.get("data_dir", "data/")
-    store(symbol=symbol, df=df, data_dir=data_dir)
+    write_changed_partitions(df=merged, base_path=data_dir, symbol=symbol, changed=changed_tuple)
 
 def detect_changed_partitions(df: pd.DataFrame):
     """
@@ -90,7 +67,12 @@ def delete_partition(base_path: str, symbol: str, year: str, month: str):
     """
 
     # Directory to be deleted
-    path = os.path.join(base_path, f"symbol={symbol}", f"year={year}", f"month={month}")
+    path = os.path.join(
+        base_path, 
+        f"symbol={symbol}", 
+        f"year={year}", 
+        f"month={month}"
+    )
 
     if os.path.exists(path):
         shutil.rmtree(path)
